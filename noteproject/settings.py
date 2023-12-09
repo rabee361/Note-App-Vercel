@@ -74,7 +74,7 @@ DATABASES = {
         default='postgres://ogwnyfge:zCKjVxCLJHUj2Tqiwixj6fAKoSqVd28Y@lallah.db.elephantsql.com/ogwnyfge',
         conn_max_age=600,
         conn_health_checks=True,
-         ssl_require=True
+        ssl_require=True
     )
 }
 
