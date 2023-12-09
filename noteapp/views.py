@@ -1,12 +1,13 @@
 from django.shortcuts import render , redirect
 from .models import *
-from .forms import NoteForm
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
+from .forms import *
+from django.contrib.auth import login , logout , authenticate
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='login')
 def home(request):
-    notes = Note.objects.all()
+    notes = Note.objects.filter(user=request.user)
+
     if request.method== 'POST':
         form = addNote(request)
         return redirect('home')
@@ -23,30 +24,20 @@ def addNote(request):
     else:
         form = NoteForm(request.POST)
         if form.is_valid():
-            form.save()
+            note = form.save(commit=False)
+            note.user = request.user
+            note.save()
     return form
 
 
-
+@login_required(login_url='login')
 def deleteNote(request , pk):
     note = Note.objects.get(id=pk)
     note.delete()
     return redirect('home')
 
 
-# def updateNote(request, pk):
-#     note = Note.objects.get(id=pk)
-#     form = NoteForm(instance=note)
-#     if request.method == 'POST':
-#         note.name = request.POST.get('name')
-#         note.save()
-#         return redirect('home')
-#     context = {
-#         'form':form
-#     }
-#     return render(request,'notes.html' , context = context)
-
-
+@login_required(login_url='login')
 def checkNote(request , pk):
     note = Note.objects.get(id=pk)
     if note.done == False:
@@ -55,3 +46,38 @@ def checkNote(request , pk):
         note.done = False
     note.save()
     return redirect('home')
+
+
+def loginUser(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        # remember_me = request.POST['remember_me']
+        # print(remember_me)
+        user = authenticate(request,username=username, password=password)
+        if user is not None:
+            login(request,user)
+            # if not remember_me:
+            #     request.session.set_expiry(0)
+            return redirect('home')
+    context = {}
+    return render(request,'login.html' , context)
+
+def registerUser(request):
+    form = MyForm()
+    if request.method == 'POST':
+        form = MyForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request,user)
+            return redirect('home')
+
+    context = {
+        'form' : form
+    }
+    return render(request , 'register.html' , context)
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect('login')
