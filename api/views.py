@@ -1,10 +1,10 @@
 from .serilaizers import *
-from base.models import *
+from noteapp.models import *
 from rest_framework.response import Response
 from django.shortcuts import redirect , render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from base.forms import *
+from noteapp.forms import *
 
 class handleNote(APIView):
     def get(self,request):
