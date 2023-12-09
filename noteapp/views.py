@@ -52,13 +52,9 @@ def loginUser(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        # remember_me = request.POST['remember_me']
-        # print(remember_me)
         user = authenticate(request,username=username, password=password)
-        if user is not None:
+        if user :
             login(request,user)
-            # if not remember_me:
-            #     request.session.set_expiry(0)
             return redirect('home')
     context = {}
     return render(request,'login.html' , context)
